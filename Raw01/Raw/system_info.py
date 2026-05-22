@@ -38,7 +38,6 @@ def get_system_info():
         info['processor'] = platform.processor()
         info['ram'] = f"{round(psutil.virtual_memory().total / (1024**3))} GB"
         
-        # Get HWID
         c = wmi.WMI()
         for board in c.Win32_BaseBoard():
             info['hwid'] = board.SerialNumber

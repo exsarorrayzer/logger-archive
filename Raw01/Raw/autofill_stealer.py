@@ -27,7 +27,6 @@ def extract_autofill():
                 conn = sqlite3.connect(temp_db, timeout=5)
                 cursor = conn.cursor()
                 
-                # Chromium autofill table
                 cursor.execute("SELECT name, value FROM autofill")
                 for row in cursor.fetchall():
                     name, value = row

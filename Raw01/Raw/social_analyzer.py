@@ -5,8 +5,6 @@ import re
 def analyze_social_media(cookies_list):
     results = []
     
-    # Simple check for account presence and basic info using cookies
-    # We mainly look for cookies that indicate a logged-in session
     socials = {
         "Twitter/X": ["auth_token", "twid"],
         "Instagram": ["sessionid", "ds_user_id"],

@@ -25,7 +25,6 @@ def get_installed_apps():
                     except: pass
         except: pass
     
-    # Remove duplicates and sort
     unique_apps = []
     seen = set()
     for app in apps:

