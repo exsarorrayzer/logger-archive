@@ -17,6 +17,7 @@ Each subdirectory contains its own `README.md` with setup and configuration inst
 - The archive is organized so modules can be picked individually without pulling the entire repo.
 - Contributions and additions are welcome as the archive grows.
 
+PLEASE USE ALL SCRIPTS IN ETHICAL CASES , ALL ILLEGAL USE CASES ARE CLEARLY FORBIDDEN
 ---
 
 **Maintained by Rayzer**
